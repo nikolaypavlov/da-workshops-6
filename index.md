@@ -323,4 +323,5 @@ summary(ftest)
 * [Lab 6 - Inference for numerical data](http://htmlpreview.github.io/?https://github.com/andrewpbray/oiLabs-base-R/blob/master/inf_for_numerical_data/inf_for_numerical_data.html)
 * Skype Chat for discussions: https://join.skype.com/gjN0CfAd4bhg
 * Reading: OpenIntro Statistics Chapter 5
+* help(dt), help(df), help(t.test), help(aov)
 * Reference Book: https://www.openintro.org/stat/textbook.php
