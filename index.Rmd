@@ -1,0 +1,304 @@
+---
+title       : Data Analysis with R
+subtitle    : Inference for numerical data
+author      : Mykola Pavlov
+job         : Data Scientist at Azzurro.io
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : [mathjax]     # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---
+## Course Logistic
+
+* Every Wednesday 19:00 - 21:00
+* Slides: http://nikolaypavlov.github.io/da-workshops-6/
+* Skype Chat: https://join.skype.com/gjN0CfAd4bhg
+* Reference Book: https://www.openintro.org/stat/textbook.php
+* help(dt), help(df)
+* Install the following packages: openintro
+
+---
+## Topics
+
+* t-distribution
+* t-test
+* Paired data
+* Difference of two means
+* ANOVA
+
+```{r, echo=F, include=F}
+library(openintro)
+```
+
+---
+## Student's t-distribution
+
+![Beer](assets/img/beer.png)
+
+---
+## t-distribution and test statistics
+
+```{r, fig.height = 4.5, fig.width = 8}
+curve(dnorm, -4, 4, n = 1000, col="red", xlab="Random variable X", ylab="Density")
+curve(dt(x, df=5), -4, 4, n = 1000, add=T, lwd=2)
+curve(dt(x, df=15), -4, 4, n = 1000, add=T, lty=2, lwd=2)
+legend("topright", c("Normal", "df=5", "df=15"), col=c("red", "black", "black"), lty=c(1,1,2))
+```
+
+$T = \frac{\text{point estimate} - \text{null value}}{SE_{\text{point estimate}}}$ - test statistics, T-score
+
+--- 
+## When to use t-distribution?
+
+### Assumptions
+
+* Independence of observations
+* Observations come from a nearly normal distribution
+* Sample size is small
+
+--- 
+## Example: Dolphins
+
+Identify a confidence interval for the average mercury content in dolphin muscle using a sample of 19 Risso’s dolphins from the Taiji area in Japan.
+
+![Dolphins](assets/img/dolphins.png)
+
+$\bar{x} \pm t_{df}SE$
+
+```{r}
+se_dolphin <- 2.3 / sqrt(19) 
+4.4 + qt(c(.025, 0.975), df=18) * se_dolphin
+```
+
+---
+## Exercise: One sample t-tests
+
+The [FDA](http://www.fda.gov/food/foodborneillnesscontaminants/metals/ucm115644.htm) webpage provides some data on mercury content of fish.
+
+![FDA data](assets/img/fda-data.png)
+
+Let's assume that 10 years before average mercury content of Anchovies was 0.022 ppm. We want to determine using this data whether the amount of mercury getting lower?
+
+1. What are appropriate hypotheses for this context?
+2. What is the p-value for the test, and what is your conclusion?
+
+```{r, echo=F, include=F}
+se_anch <- 0.017 / sqrt(14)
+t_score_anch <- (0.017 - 0.022) / se_anch
+p_anch <- pt(t_score_anch, df=13)
+```
+
+---
+## Paired data
+
+Are textbooks actually cheaper online?
+
+```{r}
+textbooks[1:5, c("ibsn", "uclaNew", "amazNew", "diff")]
+```
+
+---
+## Paired data
+
+```{r, fig.height = 4, fig.width = 8}
+hist(textbooks$diff, xlab="UCLA price - Amazon price (USD)", main="")
+print(c(length(textbooks$diff), mean(textbooks$diff), sd(textbooks$diff)))
+```
+
+---
+## Paired data
+
+* $H_0: \mu_{diff} = 0$ - There is no difference in the average textbook price
+* $H_A: \mu_{diff} \neq 0$ - There is a difference in average prices
+
+```{r}
+n <- length(textbooks$diff)
+se_diff <- sd(textbooks$diff) / sqrt(n)
+t_score_diff <- (mean(textbooks$diff) - 0) / se_diff
+2 * (1 - pt(t_score_diff, df=n-1))
+```
+
+---
+## Exercise
+
+Create a 90% confidence interval for the average price difference between books at the UCLA bookstore and books on Amazon.
+
+```{r, echo=F, include=F}
+ci_book <- mean(textbooks$diff) + qt(c(.05, .95),df=n-1) * se_diff
+```
+
+---
+## Difference of two means
+
+Does treatment using embryonic stem cells (ESCs) help improve heart function following a heart attack?
+
+![Sheep summary stats](assets/img/sheeps-ecg.png)
+
+The table contains summary statistics for an experiment to test ESCs in sheep that had a heart attack. Each of these sheep was randomly assigned to the ESC or control group, and the change in their hearts’ pumping capacity was measured in the study. A positive value corresponds to increased pumping capacity, which generally suggests a stronger recovery. Our goal will be to identify a 95% confidence interval for the effect of ESCs on the change in heart pumping capacity relative to the control group.
+
+$\overline{x_{esc}} - \overline{x_{\text{control}}}$
+
+---
+## Difference of two means
+
+### Assumptions 
+1. Each sample meets the conditions for using the t-distribution
+2. The samples are independent
+
+### Standard error
+
+$SE_{\bar{x_1} - \bar{x_2}} = \sqrt{SE_{\bar{x_1}}^2 + SE_{\bar{x_2}}^2} = \sqrt{\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}}$ 
+
+### Degrees of freedom
+
+$min\{n_1 - 1, n_2 - 2\}$ or use software estimate.
+
+---
+## Difference of two means
+
+Calculate a 95% confidence interval for the effect of ESCs on the change in heart pumping capacity of sheep after they’ve suffered a heart attack.
+
+$\overline{x_{esc}} - \overline{x_{\text{control}}} = 3.50 - (-4.33) = 7.83$
+
+$SE = \sqrt{\frac{5.17^2}{9} + \frac{2.76^2}{9}} = 1.95$
+
+$\text{point estimate} \pm t_8 SE \to 7.83 \pm 2.31 \times 1.95 \to (3.32, 12.34)$
+
+We are 95% confident that embryonic stem cells improve the heart’s pumping function in sheep that have suffered a heart attack by 3.32% to 12.34%.
+
+--- 
+## Exercise: Smoke
+
+A data set called babies_smoke represents a random sample of 150 cases of mothers and their newborns. We would like to know, is there convincing evidence that newborns from mothers who smoke have a diffeerent average birth weight than newborns from mothers who don’t smoke?
+
+```{r}
+babies_smoke <- babies[1:150, c("bwt", "smoke")]
+```
+
+1. Set up appropriate hypotheses.
+2. Plot two histograms and check for assumptions.
+3. What is the point estimate of the population difference?
+4. Compute standard error.
+5. Compute the p-value of the hypothesis test and evaluate the hypotheses using a significance level of $\alpha$ = 0.05.
+6. After that use t.test() function to do the same.
+
+```{r, echo=F, include=F}
+bs <- babies_smoke[babies_smoke$smoke == 1, 'bwt']
+bn <- babies_smoke[babies_smoke$smoke == 0, 'bwt']
+b_diff <- mean(bn) - mean(bs)
+se_smoke <- sqrt(var(bs) / length(bs)  +  var(bn) / length(bn))
+t_score_smoke <- b_diff / se_smoke
+p_smoke <- 2 * pt(-t_score_smoke, df = 54)
+```
+
+```{r, echo=F, include=F}
+t.test(bwt ~ smoke, data=babies_smoke, alternative = "two.sided")
+```
+
+---
+## Workflow for hypothesis testing
+
+* Write appropriate hypotheses.
+* Verify conditions for using the t-distribution:
+  + One-sample 
+  + Paired data
+  + For a difference of means
+* Compute the point estimate of interest, standard error, df
+* Compute T-score and p-value
+* Write a conclusion in context and in plain language so anyone can understand the result.
+
+---
+## Workflow for confidence intervals
+
+* Verify conditions for using the t-distribution as above
+* Compute the point estimate of interest, standard error, df
+* Calculate the confidence interval $\text{point estimate} \pm t_{df} \times SE$
+* Put the conclusions in context and in plain language so anyone can understand the result.
+
+---
+## ANOVA
+
+$H_0: \mu_1 = \mu_2 = \dotsc = \mu_k$, where $\mu_i$ the mean of the outcome for observations in category $i$
+
+$H_A:$ at least one mean is different
+
+### Assumptions:
+* the observations are independent within and across groups
+* the data within each group are nearly normal
+* the variability across the groups is about equal
+
+---
+## ANOVA intuition 
+
+![Side-by-side](assets/img/six-groups.png)
+
+ANOVA focuses on answering one question: is the variability in the sample means so large that it seems unlikely to be from chance alone?
+
+--- 
+## F test, F statistics
+
+* $F = \frac{MSG}{MSE}$, MSG - mean square between groups, MSE - mean square error
+* $MSE = \frac{1}{df_G}SSG = \frac{1}{{df_G}}\sum_{i=1}^{k}n_i(\bar{x_i} - \bar{x})^2$, where $df_G = k - 1$
+* $MSE = \frac{1}{df_E}SSE = \frac{1}{df_E}(SST - SSG)$, where $df_E = n - k$
+  + $SSE = \sum_{i=1}^{k}(n_i - 1)s_{i}^2$
+  + $SST = \sum_{i=1}^{n}(x_i - \bar{x})^2$
+
+```{r, fig.height = 4, fig.width = 8}
+curve(df(x, 5, 100), 0, 5, ylab="Density", main="F-distibution, df_G = 5, df_E = 100")
+```
+
+---
+## Example
+
+Major League Baseball Player Hitting Statistics for 2010 (mlbBat10). We would like to understand whether there are real differences between the batting performance of baseball players according to their position.
+
+```{r, fig.height = 5, fig.width = 10}
+bat10 <- mlbBat10[mlbBat10$AB > 200, c("OBP", "position")]
+bat10$position <- factor(bat10$position)
+boxplot(OBP ~ position, data=bat10, ylab="On-base percentage")
+```
+
+---
+## Example
+
+```{r}
+ftest <- aov(OBP ~ position, data=bat10)
+summary(ftest)
+```
+
+---
+## Exercise: Plant growth experiment
+
+```{r, echo=F, include=T}
+df <- as.data.frame(
+  PlantGrowth %>%
+    group_by(group) %>%
+    summarise(avg=mean(weight),
+              std=sd(weight),
+              num=length(weight))
+)
+df
+```
+
+1. Write the hypotheses for evaluating if the average weight level varies among the different groups.
+2. Check conditions and describe any assumptions you must make to proceed with the test.
+3. Compute F-statistics and p-value. Does this provide strong evidence against the $H_0$?
+
+```{r, echo=F, include=F}
+ft <- aov(weight ~ group, data=PlantGrowth)
+summary(ft)
+msg <- sum(df$num * (df$avg - mean(df$avg))^2) / 2
+mse <- sum(df$std^2 * (df$num - 1)) / 27
+fstat <- msg / mse
+ft_plant <- 1 - pf(fstat, 2, 27)
+```
+
+---
+## Homework
+
+* [Lab 6 - Inference for numerical data](http://htmlpreview.github.io/?https://github.com/andrewpbray/oiLabs-base-R/blob/master/inf_for_numerical_data/inf_for_numerical_data.html)
+* Skype Chat for discussions: https://join.skype.com/gjN0CfAd4bhg
+* Reading: OpenIntro Statistics Chapter 5
+* Reference Book: https://www.openintro.org/stat/textbook.php

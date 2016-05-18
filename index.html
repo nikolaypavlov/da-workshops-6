@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Data Analysis with R</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Data Analysis with R">
+  <meta name="author" content="Mykola Pavlov">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Data Analysis with R</h1>
+    <h2>Inference for numerical data</h2>
+    <p>Mykola Pavlov<br/>Data Scientist at Azzurro.io</p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Course Logistic</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Every Wednesday 19:00 - 21:00</li>
+<li>Slides: <a href="http://nikolaypavlov.github.io/da-workshops-6/">http://nikolaypavlov.github.io/da-workshops-6/</a></li>
+<li>Skype Chat: <a href="https://join.skype.com/gjN0CfAd4bhg">https://join.skype.com/gjN0CfAd4bhg</a></li>
+<li>Reference Book: <a href="https://www.openintro.org/stat/textbook.php">https://www.openintro.org/stat/textbook.php</a></li>
+<li>help(dt), help(df)</li>
+<li>Install the following packages: openintro</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Topics</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>t-distribution</li>
+<li>t-test</li>
+<li>Paired data</li>
+<li>Difference of two means</li>
+<li>ANOVA</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Student&#39;s t-distribution</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/img/beer.png" alt="Beer"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>t-distribution and test statistics</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">curve(dnorm, -4, 4, n = 1000, col=&quot;red&quot;, xlab=&quot;Random variable X&quot;, ylab=&quot;Density&quot;)
+curve(dt(x, df=5), -4, 4, n = 1000, add=T, lwd=2)
+curve(dt(x, df=15), -4, 4, n = 1000, add=T, lty=2, lwd=2)
+legend(&quot;topright&quot;, c(&quot;Normal&quot;, &quot;df=5&quot;, &quot;df=15&quot;), col=c(&quot;red&quot;, &quot;black&quot;, &quot;black&quot;), lty=c(1,1,2))
+</code></pre>
+
+<p><img src="assets/fig/unnamed-chunk-2-1.png" alt="plot of chunk unnamed-chunk-2"></p>
+
+<p>\(T = \frac{\text{point estimate} - \text{null value}}{SE_{\text{point estimate}}}\) - test statistics, T-score</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-5" style="background:;">
+  <hgroup>
+    <h2>When to use t-distribution?</h2>
+  </hgroup>
+  <article data-timings="">
+    <h3>Assumptions</h3>
+
+<ul>
+<li>Independence of observations</li>
+<li>Observations come from a nearly normal distribution</li>
+<li>Sample size is small</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-6" style="background:;">
+  <hgroup>
+    <h2>Example: Dolphins</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Identify a confidence interval for the average mercury content in dolphin muscle using a sample of 19 Risso’s dolphins from the Taiji area in Japan.</p>
+
+<p><img src="assets/img/dolphins.png" alt="Dolphins"></p>
+
+<p>\(\bar{x} \pm t_{df}SE\)</p>
+
+<pre><code class="r">se_dolphin &lt;- 2.3 / sqrt(19) 
+4.4 + qt(c(.025, 0.975), df=18) * se_dolphin
+</code></pre>
+
+<pre><code>## [1] 3.291435 5.508565
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-7" style="background:;">
+  <hgroup>
+    <h2>Exercise: One sample t-tests</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The <a href="http://www.fda.gov/food/foodborneillnesscontaminants/metals/ucm115644.htm">FDA</a> webpage provides some data on mercury content of fish.</p>
+
+<p><img src="assets/img/fda-data.png" alt="FDA data"></p>
+
+<p>Let&#39;s assume that 10 years before average mercury content of Anchovies was 0.022 ppm. We want to determine using this data whether the amount of mercury getting lower?</p>
+
+<ol>
+<li>What are appropriate hypotheses for this context?</li>
+<li>What is the p-value for the test, and what is your conclusion?</li>
+</ol>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-8" style="background:;">
+  <hgroup>
+    <h2>Paired data</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Are textbooks actually cheaper online?</p>
+
+<pre><code class="r">textbooks[1:5, c(&quot;ibsn&quot;, &quot;uclaNew&quot;, &quot;amazNew&quot;, &quot;diff&quot;)]
+</code></pre>
+
+<pre><code>##             ibsn uclaNew amazNew  diff
+## 1 978-0803272620   27.67   27.95 -0.28
+## 2 978-0030119194   40.59   31.14  9.45
+## 3 978-0300080643   31.68   32.00 -0.32
+## 4 978-0226206813   16.00   11.52  4.48
+## 5 978-0892365999   18.95   14.21  4.74
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-9" style="background:;">
+  <hgroup>
+    <h2>Paired data</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">hist(textbooks$diff, xlab=&quot;UCLA price - Amazon price (USD)&quot;, main=&quot;&quot;)
+</code></pre>
+
+<p><img src="assets/fig/unnamed-chunk-6-1.png" alt="plot of chunk unnamed-chunk-6"></p>
+
+<pre><code class="r">print(c(length(textbooks$diff), mean(textbooks$diff), sd(textbooks$diff)))
+</code></pre>
+
+<pre><code>## [1] 73.00000 12.76164 14.25530
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-10" style="background:;">
+  <hgroup>
+    <h2>Paired data</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>\(H_0: \mu_{diff} = 0\) - There is no difference in the average textbook price</li>
+<li>\(H_A: \mu_{diff} \neq 0\) - There is a difference in average prices</li>
+</ul>
+
+<pre><code class="r">n &lt;- length(textbooks$diff)
+se_diff &lt;- sd(textbooks$diff) / sqrt(n)
+t_score_diff &lt;- (mean(textbooks$diff) - 0) / se_diff
+2 * (1 - pt(t_score_diff, df=n-1))
+</code></pre>
+
+<pre><code>## [1] 6.92757e-11
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-11" style="background:;">
+  <hgroup>
+    <h2>Exercise</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Create a 90% confidence interval for the average price difference between books at the UCLA bookstore and books on Amazon.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-12" style="background:;">
+  <hgroup>
+    <h2>Difference of two means</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Does treatment using embryonic stem cells (ESCs) help improve heart function following a heart attack?</p>
+
+<p><img src="assets/img/sheeps-ecg.png" alt="Sheep summary stats"></p>
+
+<p>The table contains summary statistics for an experiment to test ESCs in sheep that had a heart attack. Each of these sheep was randomly assigned to the ESC or control group, and the change in their hearts’ pumping capacity was measured in the study. A positive value corresponds to increased pumping capacity, which generally suggests a stronger recovery. Our goal will be to identify a 95% confidence interval for the effect of ESCs on the change in heart pumping capacity relative to the control group.</p>
+
+<p>\(\overline{x_{esc}} - \overline{x_{\text{control}}}\)</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-13" style="background:;">
+  <hgroup>
+    <h2>Difference of two means</h2>
+  </hgroup>
+  <article data-timings="">
+    <h3>Assumptions</h3>
+
+<ol>
+<li>Each sample meets the conditions for using the t-distribution</li>
+<li>The samples are independent</li>
+</ol>
+
+<h3>Standard error</h3>
+
+<p>\(SE_{\bar{x_1} - \bar{x_2}} = \sqrt{SE_{\bar{x_1}}^2 + SE_{\bar{x_2}}^2} = \sqrt{\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}}\) </p>
+
+<h3>Degrees of freedom</h3>
+
+<p>\(min\{n_1 - 1, n_2 - 2\}\) or use software estimate.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-14" style="background:;">
+  <hgroup>
+    <h2>Difference of two means</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Calculate a 95% confidence interval for the effect of ESCs on the change in heart pumping capacity of sheep after they’ve suffered a heart attack.</p>
+
+<p>\(\overline{x_{esc}} - \overline{x_{\text{control}}} = 3.50 - (-4.33) = 7.83\)</p>
+
+<p>\(SE = \sqrt{\frac{5.17^2}{9} + \frac{2.76^2}{9}} = 1.95\)</p>
+
+<p>\(\text{point estimate} \pm t_8 SE \to 7.83 \pm 2.31 \times 1.95 \to (3.32, 12.34)\)</p>
+
+<p>We are 95% confident that embryonic stem cells improve the heart’s pumping function in sheep that have suffered a heart attack by 3.32% to 12.34%.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-15" style="background:;">
+  <hgroup>
+    <h2>Exercise: Smoke</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>A data set called babies_smoke represents a random sample of 150 cases of mothers and their newborns. We would like to know, is there convincing evidence that newborns from mothers who smoke have a diffeerent average birth weight than newborns from mothers who don’t smoke?</p>
+
+<pre><code class="r">babies_smoke &lt;- babies[1:150, c(&quot;bwt&quot;, &quot;smoke&quot;)]
+</code></pre>
+
+<ol>
+<li>Set up appropriate hypotheses.</li>
+<li>Plot two histograms and check for assumptions.</li>
+<li>What is the point estimate of the population difference?</li>
+<li>Compute standard error.</li>
+<li>Compute the p-value of the hypothesis test and evaluate the hypotheses using a significance level of \(\alpha\) = 0.05.</li>
+<li>After that use t.test() function to do the same.</li>
+</ol>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-16" style="background:;">
+  <hgroup>
+    <h2>Workflow for hypothesis testing</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Write appropriate hypotheses.</li>
+<li>Verify conditions for using the t-distribution:
+
+<ul>
+<li>One-sample </li>
+<li>Paired data</li>
+<li>For a difference of means</li>
+</ul></li>
+<li>Compute the point estimate of interest, standard error, df</li>
+<li>Compute T-score and p-value</li>
+<li>Write a conclusion in context and in plain language so anyone can understand the result.</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-17" style="background:;">
+  <hgroup>
+    <h2>Workflow for confidence intervals</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Verify conditions for using the t-distribution as above</li>
+<li>Compute the point estimate of interest, standard error, df</li>
+<li>Calculate the confidence interval \(\text{point estimate} \pm t_{df} \times SE\)</li>
+<li>Put the conclusions in context and in plain language so anyone can understand the result.</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-18" style="background:;">
+  <hgroup>
+    <h2>ANOVA</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>\(H_0: \mu_1 = \mu_2 = \dotsc = \mu_k\), where \(\mu_i\) the mean of the outcome for observations in category \(i\)</p>
+
+<p>\(H_A:\) at least one mean is different</p>
+
+<h3>Assumptions:</h3>
+
+<ul>
+<li>the observations are independent within and across groups</li>
+<li>the data within each group are nearly normal</li>
+<li>the variability across the groups is about equal</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-19" style="background:;">
+  <hgroup>
+    <h2>ANOVA intuition</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/img/six-groups.png" alt="Side-by-side"></p>
+
+<p>ANOVA focuses on answering one question: is the variability in the sample means so large that it seems unlikely to be from chance alone?</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-20" style="background:;">
+  <hgroup>
+    <h2>F test, F statistics</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>\(F = \frac{MSG}{MSE}\), MSG - mean square between groups, MSE - mean square error</li>
+<li>\(MSE = \frac{1}{df_G}SSG = \frac{1}\sum_{i=1}^{k}n_i(\bar{x_i} - \bar{x})^2\), where \(df_G = k - 1\)</li>
+<li>\(MSE = \frac{1}{df_E}SSE = \frac{1}{df_E}(SST - SSG)\), where \(df_E = n - k\)
+
+<ul>
+<li>\(SSE = \sum_{i=1}^{k}(n_i - 1)s_{i}^2\)</li>
+<li>\(SST = \sum_{i=1}^{n}(x_i - \bar{x})^2\)</li>
+</ul></li>
+</ul>
+
+<pre><code class="r">curve(df(x, 5, 100), 0, 5, ylab=&quot;Density&quot;, main=&quot;F-distibution, df_G = 5, df_E = 100&quot;)
+</code></pre>
+
+<p><img src="assets/fig/unnamed-chunk-12-1.png" alt="plot of chunk unnamed-chunk-12"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-21" style="background:;">
+  <hgroup>
+    <h2>Example</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Major League Baseball Player Hitting Statistics for 2010 (mlbBat10). We would like to understand whether there are real differences between the batting performance of baseball players according to their position.</p>
+
+<pre><code class="r">bat10 &lt;- mlbBat10[mlbBat10$AB &gt; 200, c(&quot;OBP&quot;, &quot;position&quot;)]
+bat10$position &lt;- factor(bat10$position)
+boxplot(OBP ~ position, data=bat10, ylab=&quot;On-base percentage&quot;)
+</code></pre>
+
+<p><img src="assets/fig/unnamed-chunk-13-1.png" alt="plot of chunk unnamed-chunk-13"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-22" style="background:;">
+  <hgroup>
+    <h2>Example</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">ftest &lt;- aov(OBP ~ position, data=bat10)
+summary(ftest)
+</code></pre>
+
+<pre><code>##              Df Sum Sq  Mean Sq F value   Pr(&gt;F)    
+## position      6 0.0374 0.006233   5.275 3.35e-05 ***
+## Residuals   320 0.3781 0.001182                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-23" style="background:;">
+  <hgroup>
+    <h2>Exercise: Plant growth experiment</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code>##   group   avg       std num
+## 1  ctrl 5.032 0.5830914  10
+## 2  trt1 4.661 0.7936757  10
+## 3  trt2 5.526 0.4425733  10
+</code></pre>
+
+<ol>
+<li>Write the hypotheses for evaluating if the average weight level varies among the different groups.</li>
+<li>Check conditions and describe any assumptions you must make to proceed with the test.</li>
+<li>Compute F-statistics and p-value. Does this provide strong evidence against the \(H_0\)?</li>
+</ol>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-24" style="background:;">
+  <hgroup>
+    <h2>Homework</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li><a href="http://htmlpreview.github.io/?https://github.com/andrewpbray/oiLabs-base-R/blob/master/inf_for_numerical_data/inf_for_numerical_data.html">Lab 6 - Inference for numerical data</a></li>
+<li>Skype Chat for discussions: <a href="https://join.skype.com/gjN0CfAd4bhg">https://join.skype.com/gjN0CfAd4bhg</a></li>
+<li>Reading: OpenIntro Statistics Chapter 5</li>
+<li>Reference Book: <a href="https://www.openintro.org/stat/textbook.php">https://www.openintro.org/stat/textbook.php</a></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Course Logistic'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Topics'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Student&#39;s t-distribution'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='t-distribution and test statistics'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='When to use t-distribution?'>
+         5
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=6 title='Example: Dolphins'>
+         6
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=7 title='Exercise: One sample t-tests'>
+         7
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=8 title='Paired data'>
+         8
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=9 title='Paired data'>
+         9
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=10 title='Paired data'>
+         10
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=11 title='Exercise'>
+         11
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=12 title='Difference of two means'>
+         12
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=13 title='Difference of two means'>
+         13
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=14 title='Difference of two means'>
+         14
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=15 title='Exercise: Smoke'>
+         15
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=16 title='Workflow for hypothesis testing'>
+         16
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=17 title='Workflow for confidence intervals'>
+         17
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=18 title='ANOVA'>
+         18
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=19 title='ANOVA intuition'>
+         19
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=20 title='F test, F statistics'>
+         20
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=21 title='Example'>
+         21
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=22 title='Example'>
+         22
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=23 title='Exercise: Plant growth experiment'>
+         23
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=24 title='Homework'>
+         24
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <!-- <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script> -->
+  <script>window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="libraries/widgets/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"><\/script>')
+</script>
+<!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
