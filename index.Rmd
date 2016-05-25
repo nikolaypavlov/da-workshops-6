@@ -85,7 +85,7 @@ Let's assume that 10 years before average mercury content of Anchovies was 0.022
 2. What is the p-value for the test, and what is your conclusion?
 
 ```{r, echo=F, include=F}
-se_anch <- 0.017 / sqrt(14)
+se_anch <- 0.015 / sqrt(14)
 t_score_anch <- (0.017 - 0.022) / se_anch
 p_anch <- pt(t_score_anch, df=13)
 ```
