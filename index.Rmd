@@ -85,7 +85,7 @@ Let's assume that 10 years before average mercury content of Anchovies was 0.022
 2. What is the p-value for the test, and what is your conclusion?
 
 ```{r, echo=F, include=F}
-se_anch <- 0.017 / sqrt(14)
+se_anch <- 0.015 / sqrt(14)
 t_score_anch <- (0.017 - 0.022) / se_anch
 p_anch <- pt(t_score_anch, df=13)
 ```
@@ -240,7 +240,7 @@ ANOVA focuses on answering one question: is the variability in the sample means 
 ## F test, F statistics
 
 * $F = \frac{MSG}{MSE}$, MSG - mean square between groups, MSE - mean square error
-* $MSE = \frac{1}{df_G}SSG = \frac{1}{{df_G}}\sum_{i=1}^{k}n_i(\bar{x_i} - \bar{x})^2$, where $df_G = k - 1$
+* $MSG = \frac{1}{df_G}SSG = \frac{1}{{df_G}}\sum_{i=1}^{k}n_i(\bar{x_i} - \bar{x})^2$, where $df_G = k - 1$
 * $MSE = \frac{1}{df_E}SSE = \frac{1}{df_E}(SST - SSG)$, where $df_E = n - k$
   + $SSE = \sum_{i=1}^{k}(n_i - 1)s_{i}^2$
   + $SST = \sum_{i=1}^{n}(x_i - \bar{x})^2$
